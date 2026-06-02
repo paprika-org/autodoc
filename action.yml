@@ -1,0 +1,39 @@
+name: 'AutoDoc'
+description: 'Generate PR summaries, ADR drafts, and onboarding docs from code changes — zero manual input'
+author: 'Paprika Labs'
+
+branding:
+  icon: 'file-text'
+  color: 'orange'
+
+inputs:
+  openai_api_key:
+    description: 'OpenAI API key for doc generation'
+    required: true
+  github_token:
+    description: 'GitHub token (use secrets.GITHUB_TOKEN)'
+    required: true
+  doc_types:
+    description: 'Comma-separated list of doc types to generate: pr_summary,adr,onboarding'
+    required: false
+    default: 'pr_summary,adr'
+  post_comment:
+    description: 'Post generated docs as a PR comment'
+    required: false
+    default: 'true'
+  commit_docs:
+    description: 'Commit generated docs to docs/autodoc/ in the PR branch'
+    required: false
+    default: 'false'
+
+outputs:
+  pr_summary:
+    description: 'Generated PR summary markdown'
+  adr_draft:
+    description: 'Generated ADR draft markdown'
+  onboarding_update:
+    description: 'Generated onboarding guide update'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
