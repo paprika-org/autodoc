@@ -1,4 +1,4 @@
 node_modules/
-dist/
+# dist/ is committed — GitHub Actions require the compiled bundle in the repo
 *.js.map
 .env

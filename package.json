@@ -4,7 +4,7 @@
   "description": "Pipeline-native AI documentation — PR summaries, ADRs, and onboarding guides from code changes",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "ncc build src/index.ts -o dist --license licenses.txt",
     "start": "node dist/index.js"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@vercel/ncc": "^0.38.4",
     "typescript": "^5.4.0"
   }
 }
