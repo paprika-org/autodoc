@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoDoc — Pipeline-native AI documentation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0f10;
+      --surface: #1a1a1c;
+      --border: #2a2a2d;
+      --text: #e8e8ea;
+      --muted: #888;
+      --accent: #e85d26;
+      --code-bg: #141416;
+      --green: #3fb950;
+      --blue: #58a6ff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* nav */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(15,15,16,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-logo .pill {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 100px;
+      letter-spacing: 0.03em;
+    }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #c94f1e; text-decoration: none; }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--surface); text-decoration: none; }
+
+    /* hero */
+    .hero {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 32px;
+      line-height: 1.65;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* install */
+    .install-block {
+      max-width: 760px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .code-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      font-family: ui-monospace, "SFMono-Regular", monospace;
+    }
+    .code-body {
+      padding: 16px;
+      font-family: ui-monospace, "SFMono-Regular", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .kw { color: #f97583; }
+    .str { color: #9ecbff; }
+    .cm { color: var(--muted); }
+    .key { color: #79b8ff; }
+    .val { color: var(--green); }
+
+    /* how it works */
+    .section {
+      max-width: 900px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section h2 {
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .section > p {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 540px;
+      margin-bottom: 36px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .step-num {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .step h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .step p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+    /* demo */
+    .demo-section {
+      max-width: 900px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .demo-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .demo-section h2 {
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .demo-section > p {
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .demo-output {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .demo-output-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green { background: #28c840; }
+    .demo-output-body {
+      padding: 20px 24px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .demo-output-body h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: var(--blue);
+    }
+    .demo-output-body h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 20px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .demo-output-body p { color: var(--text); margin-bottom: 10px; }
+    .demo-output-body .tag {
+      display: inline-block;
+      background: rgba(232, 93, 38, 0.15);
+      border: 1px solid rgba(232, 93, 38, 0.3);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 8px;
+      border-radius: 100px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    .demo-repo-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .demo-repo-label strong { color: var(--text); }
+
+    /* pricing */
+    .pricing-section {
+      max-width: 900px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .pricing-section h2 {
+      font-size: clamp(24px, 3vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .pricing-section > p {
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent);
+    }
+    .card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .card-price {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .card-price sub {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .card-desc {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .card-features { list-style: none; margin-bottom: 24px; }
+    .card-features li {
+      font-size: 14px;
+      color: var(--text);
+      padding: 5px 0;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .card-features li::before {
+      content: "✓";
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* cta */
+    .cta-section {
+      max-width: 600px;
+      margin: 0 auto 80px;
+      padding: 48px 24px;
+      text-align: center;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-section h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    .cta-section p { color: var(--muted); margin-bottom: 24px; }
+    .cta-wrap { max-width: 900px; margin: 0 auto 80px; padding: 0 24px; }
+
+    /* footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero { padding: 48px 16px 40px; }
+      .hero p { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    AutoDoc
+    <span class="pill">PILOT</span>
+  </div>
+  <div class="nav-links">
+    <a href="#demo">Demo</a>
+    <a href="#pricing">Pricing</a>
+    <a href="https://github.com/paprika-org/autodoc">GitHub</a>
+  </div>
+  <a href="mailto:hello@paprika-labs.app?subject=AutoDoc pilot" class="btn btn-primary">Start pilot</a>
+</nav>
+
+<section class="hero">
+  <h1>Your PRs document themselves.<br><span>Zero engineer input.</span></h1>
+  <p>AutoDoc runs as a GitHub Action. Every time a PR opens, it reads the diff and posts a PR summary, ADR draft, and onboarding update — automatically.</p>
+  <div class="hero-actions">
+    <a href="mailto:hello@paprika-labs.app?subject=AutoDoc pilot" class="btn btn-primary">Join paid pilot →</a>
+    <a href="https://github.com/paprika-org/autodoc" class="btn btn-outline">View on GitHub</a>
+  </div>
+</section>
+
+<div class="install-block">
+  <div class="code-box">
+    <div class="code-header">.github/workflows/autodoc.yml — add and forget</div>
+    <div class="code-body">
+      <span class="cm"># Add this file. That's the whole install.</span><br>
+      <span class="kw">name</span>: <span class="str">AutoDoc</span><br>
+      <br>
+      <span class="kw">on</span>:<br>
+      &nbsp;&nbsp;<span class="kw">pull_request</span>:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">types</span>: [<span class="str">opened</span>, <span class="str">synchronize</span>, <span class="str">reopened</span>]<br>
+      <br>
+      <span class="kw">jobs</span>:<br>
+      &nbsp;&nbsp;<span class="kw">autodoc</span>:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">runs-on</span>: <span class="str">ubuntu-latest</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">permissions</span>:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">pull-requests</span>: <span class="val">write</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">contents</span>: <span class="val">write</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">steps</span>:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="kw">uses</span>: <span class="str">paprika-org/autodoc@v0.1</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">with</span>:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">openai_api_key</span>: <span class="val">${{ secrets.OPENAI_API_KEY }}</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key">github_token</span>: <span class="val">${{ secrets.GITHUB_TOKEN }}</span>
+    </div>
+  </div>
+</div>
+
+<section class="section" id="how">
+  <div class="section-label">How it works</div>
+  <h2>One workflow file. Docs on every PR.</h2>
+  <p>AutoDoc hooks into your existing CI. Nothing to host, nothing to maintain.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>PR opened</h3>
+      <p>A developer opens or updates a pull request. AutoDoc triggers automatically via GitHub Actions.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Diff analysed</h3>
+      <p>AutoDoc reads the full diff, the PR title, and recent commit messages to understand what changed and why.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Docs posted</h3>
+      <p>A structured comment appears on the PR: summary, architecture note, and onboarding impact. Already there when reviewers arrive.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Saved to repo</h3>
+      <p>ADR drafts and onboarding updates are committed to <code style="font-size:12px;color:#9ecbff">docs/</code> so they accumulate over time.</p>
+    </div>
+  </div>
+</section>
+
+<section class="demo-section" id="demo">
+  <div class="demo-label">Live example</div>
+  <h2>What it actually generates</h2>
+  <p style="color:var(--muted)">This was generated from a real merged PR in <a href="https://github.com/iFurySt/open-codex-computer-use">iFurySt/open-codex-computer-use</a>. AutoDoc ran on the diff with no human input.</p>
+
+  <div class="demo-output">
+    <div class="demo-output-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span style="margin-left:8px">PR #19 — fix(cli): accept numeric element_index arguments</span>
+    </div>
+    <div class="demo-output-body">
+      <div class="demo-repo-label">AutoDoc comment on <strong>iFurySt/open-codex-computer-use</strong></div>
+
+      <h3>📄 AutoDoc — PR Summary</h3>
+      <p>This PR fixes a bug where CLI arguments for <code style="font-size:12px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px">element_index</code> were incorrectly handled when passed as numbers, causing failures in tool commands. A normalisation step now accepts both string and numeric values. Both Linux and Windows versions updated; new test cases added for <code style="font-size:12px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px">optionalElementIndex</code>.</p>
+
+      <h4>Architecture Note</h4>
+      <p style="color:var(--muted);font-size:14px">Minor change — no ADR needed. Input type coercion handled at the CLI argument boundary, not inside tool logic.</p>
+
+      <h4>Onboarding Impact</h4>
+      <p style="color:var(--muted);font-size:14px">New contributors: <code style="font-size:12px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px">element_index</code> accepts integers or strings. Normalisation happens before any tool call — no need to handle both types downstream.</p>
+
+      <div style="margin-top:16px">
+        <span class="tag">cli</span>
+        <span class="tag">bug-fix</span>
+        <span class="tag">cross-platform</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2>Paid pilot — limited spots</h2>
+  <p style="color:var(--muted)">We're running a hands-on pilot with a small group of teams. You get direct access, we get feedback. Pilot pricing is locked in for life.</p>
+  <div class="pricing-cards">
+    <div class="pricing-card">
+      <div class="card-badge">Open source</div>
+      <div class="card-price">Free</div>
+      <div class="card-desc">Self-hosted. Bring your own OpenAI key. Full source on GitHub.</div>
+      <ul class="card-features">
+        <li>PR summaries on every PR</li>
+        <li>ADR drafts to docs/</li>
+        <li>Onboarding update commits</li>
+        <li>GitHub Actions install</li>
+      </ul>
+      <a href="https://github.com/paprika-org/autodoc" class="btn btn-outline" style="width:100%;justify-content:center">View on GitHub</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="card-badge">Pilot — limited spots</div>
+      <div class="card-price">$300 <sub>setup + $39/repo/month</sub></div>
+      <div class="card-desc">We install, configure, and tune it for your stack. You get docs that actually match how your team writes.</div>
+      <ul class="card-features">
+        <li>Everything in open source</li>
+        <li>Managed setup + tuning</li>
+        <li>Custom output templates</li>
+        <li>Direct Slack access during pilot</li>
+        <li>Pilot price locked in forever</li>
+      </ul>
+      <a href="mailto:hello@paprika-labs.app?subject=AutoDoc pilot" class="btn btn-primary" style="width:100%;justify-content:center">Apply for pilot →</a>
+    </div>
+  </div>
+</section>
+
+<div class="cta-wrap">
+  <div class="cta-section">
+    <h2>Docs that write themselves.</h2>
+    <p>Ten-minute install. Works on the next PR you open.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="mailto:hello@paprika-labs.app?subject=AutoDoc pilot" class="btn btn-primary">Start pilot</a>
+      <a href="https://github.com/paprika-org/autodoc" class="btn btn-outline">Self-host free →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>AutoDoc is a product of <a href="https://paprika-labs.app">Paprika Labs</a> — <a href="mailto:hello@paprika-labs.app">hello@paprika-labs.app</a></p>
+</footer>
+
+</body>
+</html>
