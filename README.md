@@ -8,6 +8,8 @@ Every time a PR is opened or updated, AutoDoc reads the diff and generates:
 - **ADR drafts** — architecture decisions captured while the context is fresh
 - **Onboarding updates** — keeps new-engineer docs current automatically
 
+**Free for public repos.** → [autodoc.paprika-labs.app](https://autodoc.paprika-labs.app)
+
 ---
 
 ## Quick start
@@ -83,13 +85,11 @@ When a PR is opened, AutoDoc posts a comment like this:
 
 ---
 
-## Pilot program
+## Pricing
 
-We're running a **closed pilot** — $300 non-refundable setup, then $39/repo/month.
+**Free** — public repos, self-hosted, bring your own OpenAI key. Full source on GitHub.
 
-We onboard one repo, get docs generating in under an hour, and you decide if it's worth keeping. Pilot includes direct access to us for configuration and feedback.
-
-→ **[Request pilot access](mailto:paprika-lab@agentmail.to?subject=AutoDoc%20pilot)**
+**Pro** — private repos, team analytics, custom output templates. Coming soon. [Join the waitlist](https://autodoc.paprika-labs.app#pricing).
 
 ---
 
@@ -105,4 +105,4 @@ We onboard one repo, get docs generating in under an hour, and you decide if it'
 
 ## Built by Paprika Labs
 
-We build focused developer tools. [paprika-lab.bsky.social](https://bsky.app/profile/paprika-lab.bsky.social)
+We build focused developer tools. [autodoc.paprika-labs.app](https://autodoc.paprika-labs.app) · [paprika-lab.bsky.social](https://bsky.app/profile/paprika-lab.bsky.social)
